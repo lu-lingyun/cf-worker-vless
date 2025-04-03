@@ -120,7 +120,7 @@ async function 解析VL标头(VL数据, TCP接口) {
       if (我的SOCKS5账号) {
         try {
           TCP接口 = await 创建SOCKS5接口(识别地址类型, 访问地址, 访问端口);
-          await TCP接口.opened;
+          await SOCKS5接口.opened;
         } catch {
           if (反代IP) {
             let [反代IP地址, 反代IP端口] = 反代IP.split(":");
