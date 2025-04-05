@@ -9,7 +9,7 @@ let 我的优选TXT = ["https://raw.githubusercontent.com/shulng/shulng/refs/hea
 let 反代IP = "proxyip.cmliussss.net:443"; // 反代IP或域名
 
 let 启用SOCKS5全局反代 = false; // 启用SOCKS5全局反代
-let 我的SOCKS5账号 = "shulng:shulng@188.68.234.53:21440"; // SOCKS5账号
+let 我的SOCKS5账号 = ""; // SOCKS5账号
 
 let 我的节点名字 = "水灵"; // 节点名字
 
