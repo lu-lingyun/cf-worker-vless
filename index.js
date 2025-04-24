@@ -41,8 +41,8 @@ export default {
       if (url.pathname === `/${哎呀呀这是我的ID啊}`) {
         const 用户代理 = 访问请求.headers.get("User-Agent").toLowerCase();
         const 配置生成器 = {
-          v2ray: 给我通用配置文件,
-          clash: 给我小猫咪配置文件,
+          v2ray: 生成通用配置,
+          clash: 生成猫咪配置
         };
         const 工具 = Object.keys(配置生成器).find((工具) => 用户代理.includes(工具));
         const 生成配置 = 配置生成器[工具];
@@ -258,7 +258,7 @@ let 转码 = "vl",
   符号 = "://",
   小猫 = "cla",
   咪 = "sh";
-function 给我通用配置文件(hostName) {
+function 生成通用配置(hostName) {
   if (我的优选.length === 0) {
     我的优选 = [`${hostName}:443`];
   }
@@ -274,7 +274,7 @@ function 给我通用配置文件(hostName) {
     })
     .join("\n");
 }
-function 给我小猫咪配置文件(hostName) {
+function 生成猫咪配置(hostName) {
   if (我的优选.length === 0) {
     我的优选 = [`${hostName}:443`];
   }
