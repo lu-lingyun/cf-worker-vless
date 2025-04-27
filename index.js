@@ -64,7 +64,7 @@ async function 升级WS请求(访问请求) {
   const 读取我的加密访问内容数据头 = 访问请求.headers.get("sec-websocket-protocol");
   const 解密数据 = 使用64位加解密(读取我的加密访问内容数据头);
   const { TCP接口, 写入初始数据 } = await 解析VL标头(解密数据);
-  建立传输管道(WS接口, TCP接口, 写入初始数据);
+  await 建立传输管道(WS接口, TCP接口, 写入初始数据);
   return new Response(null, { status: 101, webSocket: 客户端 });
 }
 
@@ -173,7 +173,7 @@ async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
       });
     },
   });
-  await 数据流.pipeTo(
+  数据流.pipeTo(
     new WritableStream({
       async write(VL数据) {
         await 传输数据.write(VL数据);
