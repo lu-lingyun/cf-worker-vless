@@ -1,4 +1,5 @@
 import { connect } from "cloudflare:sockets";
+
 //////////////////////////////////////////////////////////////////////////配置区块////////////////////////////////////////////////////////////////////////
 let 哎呀呀这是我的ID啊 = "shulng"; // 订阅路径
 let 哎呀呀这是我的VL密钥 = "25284107-7424-40a5-8396-cdd0623f4f05"; // UUID
@@ -22,19 +23,17 @@ export default {
       if (我的优选TXT.length > 0) {
         我的优选 = [
           ...new Set(
-            (
-              await Promise.all(
-                我的优选TXT.map(async (url) => {
-                  const response = await fetch(url);
-                  return response.ok
-                    ? (await response.text())
-                        .split("\n")
-                        .map((line) => line.trim())
-                        .filter((line) => line)
-                    : [];
-                })
-              )
-            ).flat()
+            (await Promise.all(
+              我的优选TXT.map(async (url) => {
+                const response = await fetch(url);
+                return response.ok
+                  ? (await response.text())
+                      .split("\n")
+                      .map((line) => line.trim())
+                      .filter((line) => line)
+                  : [];
+              })
+            )).flat()
           ),
         ];
       }
@@ -56,25 +55,26 @@ export default {
     }
   },
 };
+
 ////////////////////////////////////////////////////////////////////////脚本主要架构//////////////////////////////////////////////////////////////////////
-//第一步，读取和构建基础访问结构
 async function 升级WS请求(访问请求) {
   const 创建WS接口 = new WebSocketPair();
   const [客户端, WS接口] = Object.values(创建WS接口);
   WS接口.accept();
   const 读取我的加密访问内容数据头 = 访问请求.headers.get("sec-websocket-protocol");
-  const 解密数据 = 使用64位加解密(读取我的加密访问内容数据头); //解密目标访问数据，传递给TCP握手进程
-  const { TCP接口, 写入初始数据 } = await 解析VL标头(解密数据); //解析VL数据并进行TCP握手
-  建立传输管道(WS接口, TCP接口, 写入初始数据);
+  const 解密数据 = 使用64位加解密(读取我的加密访问内容数据头);
+  const { TCP接口, 写入初始数据 } = await 解析VL标头(解密数据);
+  await 建立传输管道(WS接口, TCP接口, 写入初始数据);
   return new Response(null, { status: 101, webSocket: 客户端 });
 }
+
 function 使用64位加解密(还原混淆字符) {
   还原混淆字符 = 还原混淆字符.replace(/-/g, "+").replace(/_/g, "/");
   const 解密数据 = atob(还原混淆字符);
   const 解密_你_个_丁咚_咙_咚呛 = Uint8Array.from(解密数据, (c) => c.charCodeAt(0));
   return 解密_你_个_丁咚_咙_咚呛.buffer;
 }
-//第二步，解读VL协议数据，创建TCP握手
+
 async function 解析VL标头(VL数据, TCP接口) {
   if (验证VL的密钥(new Uint8Array(VL数据.slice(1, 17))) !== 哎呀呀这是我的VL密钥) {
     return null;
@@ -135,28 +135,28 @@ async function 解析VL标头(VL数据, TCP接口) {
   }
   return { TCP接口, 写入初始数据 };
 }
+
 function 验证VL的密钥(arr, offset = 0) {
   const uuid = (转换密钥格式[arr[offset + 0]] + 转换密钥格式[arr[offset + 1]] + 转换密钥格式[arr[offset + 2]] + 转换密钥格式[arr[offset + 3]] + "-" + 转换密钥格式[arr[offset + 4]] + 转换密钥格式[arr[offset + 5]] + "-" + 转换密钥格式[arr[offset + 6]] + 转换密钥格式[arr[offset + 7]] + "-" + 转换密钥格式[arr[offset + 8]] + 转换密钥格式[arr[offset + 9]] + "-" + 转换密钥格式[arr[offset + 10]] + 转换密钥格式[arr[offset + 11]] + 转换密钥格式[arr[offset + 12]] + 转换密钥格式[arr[offset + 13]] + 转换密钥格式[arr[offset + 14]] + 转换密钥格式[arr[offset + 15]]).toLowerCase();
   return uuid;
 }
+
 const 转换密钥格式 = [];
 for (let i = 0; i < 256; ++i) {
   转换密钥格式.push((i + 256).toString(16).slice(1));
 }
-//第三步，创建客户端WS-CF-目标的传输通道并监听状态
+
 async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
-  const 传输数据 = TCP接口.writable.getWriter();
-  await WS接口.send(new Uint8Array([0, 0]).buffer); //向客户端发送WS握手认证信息
-  TCP接口.readable.pipeTo(
+  const 传输数据 = await TCP接口.writable.getWriter();
+  await WS接口.send(new Uint8Array([0, 0]).buffer);
+  await TCP接口.readable.pipeTo(
     new WritableStream({
-      //将TCP接口返回的数据通过WS接口发送回客户端【优先建立客户端与CF的WS回传通道，防止初始包返回数据时通道任未建立导致丢失数据】
       async write(VL数据) {
         await WS接口.send(VL数据);
       },
     })
   );
   const 数据流 = new ReadableStream({
-    //监听WS接口数据并发送给数据流
     async start(控制器) {
       if (写入初始数据) {
         控制器.enqueue(写入初始数据);
@@ -164,24 +164,24 @@ async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
       }
       WS接口.addEventListener("message", (event) => {
         控制器.enqueue(event.data);
-      }); //监听客户端WS接口消息，推送给数据流
+      });
       WS接口.addEventListener("close", () => {
         控制器.close();
-      }); //监听客户端WS接口关闭信息，结束流传输
+      });
       WS接口.addEventListener("error", () => {
         控制器.close();
-      }); //监听客户端WS接口异常信息，结束流传输
+      });
     },
   });
-  数据流.pipeTo(
+  await 数据流.pipeTo(
     new WritableStream({
-      //将客户端接收到的WS数据发往TCP接口
       async write(VL数据) {
         await 传输数据.write(VL数据);
       },
     })
   );
 }
+
 //////////////////////////////////////////////////////////////////////////SOCKS5部分//////////////////////////////////////////////////////////////////////
 async function 创建SOCKS5接口(识别地址类型, 访问地址, 访问端口) {
   const { username, password, hostname, port } = await 获取SOCKS5账号(我的SOCKS5账号);
@@ -191,43 +191,42 @@ async function 创建SOCKS5接口(识别地址类型, 访问地址, 访问端口
   } catch {
     return new Response("SOCKS5未连通", { status: 400 });
   }
-  const writer = SOCKS5接口.writable.getWriter();
-  const reader = SOCKS5接口.readable.getReader();
+  const writer = await SOCKS5接口.writable.getWriter();
+  const reader = await SOCKS5接口.readable.getReader();
   const encoder = new TextEncoder();
-  const socksGreeting = new Uint8Array([5, 2, 0, 2]); //构建认证信息,支持无认证和用户名/密码认证
+  const socksGreeting = new Uint8Array([5, 2, 0, 2]);
   await writer.write(socksGreeting);
   let res = (await reader.read()).value;
   if (res[1] === 0x02) {
-    //检查是否需要用户名/密码认证
     if (!username || !password) {
       return 关闭接口并退出();
     }
-    const authRequest = new Uint8Array([1, username.length, ...encoder.encode(username), password.length, ...encoder.encode(password)]); // 发送用户名/密码认证请求
+    const authRequest = new Uint8Array([1, username.length, ...encoder.encode(username), password.length, ...encoder.encode(password)]);
     await writer.write(authRequest);
     res = (await reader.read()).value;
     if (res[0] !== 0x01 || res[1] !== 0x00) {
-      return 关闭接口并退出(); // 认证失败
+      return 关闭接口并退出();
     }
   }
   let 转换访问地址;
   switch (识别地址类型) {
-    case 1: // IPv4
+    case 1:
       转换访问地址 = new Uint8Array([1, ...访问地址.split(".").map(Number)]);
       break;
-    case 2: // 域名
+    case 2:
       转换访问地址 = new Uint8Array([3, 访问地址.length, ...encoder.encode(访问地址)]);
       break;
-    case 3: // IPv6
+    case 3:
       转换访问地址 = new Uint8Array([4, ...访问地址.split(":").flatMap((x) => [parseInt(x.slice(0, 2), 16), parseInt(x.slice(2), 16)])]);
       break;
     default:
       return 关闭接口并退出();
   }
-  const socksRequest = new Uint8Array([5, 1, 0, ...转换访问地址, 访问端口 >> 8, 访问端口 & 0xff]); //发送转换后的访问地址/端口
+  const socksRequest = new Uint8Array([5, 1, 0, ...转换访问地址, 访问端口 >> 8, 访问端口 & 0xff]);
   await writer.write(socksRequest);
   res = (await reader.read()).value;
   if (res[0] !== 0x05 || res[1] !== 0x00) {
-    return 关闭接口并退出(); // 连接失败
+    return 关闭接口并退出();
   }
   writer.releaseLock();
   reader.releaseLock();
@@ -239,6 +238,7 @@ async function 创建SOCKS5接口(识别地址类型, 访问地址, 访问端口
     return new Response("SOCKS5握手失败", { status: 400 });
   }
 }
+
 async function 获取SOCKS5账号(SOCKS5) {
   const [latter, former] = SOCKS5.split("@").reverse();
   let username, password, hostname, port;
@@ -252,12 +252,14 @@ async function 获取SOCKS5账号(SOCKS5) {
   hostname = latters.join(":");
   return { username, password, hostname, port };
 }
+
 //////////////////////////////////////////////////////////////////////////订阅页面////////////////////////////////////////////////////////////////////////
 let 转码 = "vl",
   转码2 = "ess",
   符号 = "://",
   小猫 = "cla",
   咪 = "sh";
+
 function 生成通用配置(hostName) {
   if (我的优选.length === 0) {
     我的优选 = [`${hostName}:443`];
@@ -274,6 +276,7 @@ function 生成通用配置(hostName) {
     })
     .join("\n");
 }
+
 function 生成猫咪配置(hostName) {
   if (我的优选.length === 0) {
     我的优选 = [`${hostName}:443`];
