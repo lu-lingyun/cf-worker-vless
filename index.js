@@ -6,7 +6,7 @@ let 哎呀呀这是我的VL密钥 = "25284107-7424-40a5-8396-cdd0623f4f05"; // U
 let 我的优选 = []; // 节点列表
 let 我的优选TXT = ["https://raw.githubusercontent.com/shulng/shulng/refs/heads/main/ip.txt"]; // 优选TXT路径
 
-let 反代IP = "proxyip.cmliussss.net:443"; // 反代IP或域名
+let 反代IP = "fdip.houyitfg.asia"; // 反代IP或域名
 
 let 启用SOCKS5全局反代 = false; // 启用SOCKS5全局反代
 let 我的SOCKS5账号 = ""; // SOCKS5账号
