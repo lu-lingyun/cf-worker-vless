@@ -28,8 +28,8 @@ export default {
                   const response = await fetch(url);
                   return response.ok
                     ? (await response.text())
-                        .split("\n")
-                        .map((line) => line.trim())
+          .split("\n")
+          .map((line) => line.trim())
                         .filter((line) => line)
                     : [];
                 })
@@ -47,26 +47,23 @@ export default {
         const 工具 = Object.keys(配置生成器).find((工具) => 用户代理.includes(工具));
         const 生成配置 = 配置生成器[工具];
         return new Response(生成配置(访问请求.headers.get("Host")), {
-          status: 200,
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-        });
-      }
+              status: 200,
+              headers: { "Content-Type": "text/plain;charset=utf-8" },
+            });
+          }
     } else if (读取我的请求标头 === "websocket") {
-      return await 升级WS请求(访问请求);
-    }
+        return await 升级WS请求(访问请求);
+      }
   },
 };
 ////////////////////////////////////////////////////////////////////////脚本主要架构//////////////////////////////////////////////////////////////////////
 //第一步，读取和构建基础访问结构
 async function 升级WS请求(访问请求) {
-  const 创建WS接口 = new WebSocketPair();
-  const [客户端, WS接口] = Object.values(创建WS接口);
-  WS接口.accept();
-  const 读取我的加密访问内容数据头 = 访问请求.headers.get("sec-websocket-protocol");
+  const [客户端, WS接口] = new WebSocketPair(); //创建WS接口对象
+  const 读取我的加密访问内容数据头 = 访问请求.headers.get("sec-websocket-protocol"); //读取访问标头中的WS通信数据
   const 解密数据 = 使用64位加解密(读取我的加密访问内容数据头); //解密目标访问数据，传递给TCP握手进程
-  const { TCP接口, 写入初始数据 } = await 解析VL标头(解密数据); //解析VL数据并进行TCP握手
-  建立传输管道(WS接口, TCP接口, 写入初始数据);
-  return new Response(null, { status: 101, webSocket: 客户端 });
+  await 解析VL标头(解密数据, WS接口); //解析VL数据并进行TCP握手
+  return new Response(null, { status: 101, webSocket: 客户端 }); //一切准备就绪后，回复客户端WS连接升级成功
 }
 function 使用64位加解密(还原混淆字符) {
   还原混淆字符 = 还原混淆字符.replace(/-/g, "+").replace(/_/g, "/");
@@ -75,7 +72,7 @@ function 使用64位加解密(还原混淆字符) {
   return 解密_你_个_丁咚_咙_咚呛.buffer;
 }
 //第二步，解读VL协议数据，创建TCP握手
-async function 解析VL标头(VL数据, TCP接口) {
+async function 解析VL标头(VL数据, WS接口, TCP接口) {
   if (验证VL的密钥(new Uint8Array(VL数据.slice(1, 17))) !== 哎呀呀这是我的VL密钥) {
     return null;
   }
@@ -114,7 +111,7 @@ async function 解析VL标头(VL数据, TCP接口) {
     TCP接口 = await 创建SOCKS5接口(识别地址类型, 访问地址, 访问端口);
   } else {
     try {
-      TCP接口 = await connect({ hostname: 访问地址, port: 访问端口 });
+      TCP接口 = connect({ hostname: 访问地址, port: 访问端口 });
       await TCP接口.opened;
     } catch {
       if (我的SOCKS5账号) {
@@ -123,17 +120,17 @@ async function 解析VL标头(VL数据, TCP接口) {
           await SOCKS5接口.opened;
         } catch {
           if (反代IP) {
-            let [反代IP地址, 反代IP端口] = 反代IP.split(":");
-            TCP接口 = await connect({ hostname: 反代IP地址, port: 反代IP端口 || 访问端口 });
+          let [反代IP地址, 反代IP端口] = 反代IP.split(":");
+            TCP接口 = connect({ hostname: 反代IP地址, port: 反代IP端口 || 访问端口 });
           }
         }
       } else if (反代IP) {
         let [反代IP地址, 反代IP端口] = 反代IP.split(":");
-        TCP接口 = await connect({ hostname: 反代IP地址, port: 反代IP端口 || 访问端口 });
+        TCP接口 = connect({ hostname: 反代IP地址, port: 反代IP端口 || 访问端口 });
       }
     }
   }
-  return { TCP接口, 写入初始数据 };
+  建立传输管道(WS接口, TCP接口, 写入初始数据); //建立WS接口与TCP接口的传输管道
 }
 function 验证VL的密钥(arr, offset = 0) {
   const uuid = (转换密钥格式[arr[offset + 0]] + 转换密钥格式[arr[offset + 1]] + 转换密钥格式[arr[offset + 2]] + 转换密钥格式[arr[offset + 3]] + "-" + 转换密钥格式[arr[offset + 4]] + 转换密钥格式[arr[offset + 5]] + "-" + 转换密钥格式[arr[offset + 6]] + 转换密钥格式[arr[offset + 7]] + "-" + 转换密钥格式[arr[offset + 8]] + 转换密钥格式[arr[offset + 9]] + "-" + 转换密钥格式[arr[offset + 10]] + 转换密钥格式[arr[offset + 11]] + 转换密钥格式[arr[offset + 12]] + 转换密钥格式[arr[offset + 13]] + 转换密钥格式[arr[offset + 14]] + 转换密钥格式[arr[offset + 15]]).toLowerCase();
@@ -145,42 +142,22 @@ for (let i = 0; i < 256; ++i) {
 }
 //第三步，创建客户端WS-CF-目标的传输通道并监听状态
 async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
-  const 传输数据 = TCP接口.writable.getWriter();
-  await WS接口.send(new Uint8Array([0, 0]).buffer); //向客户端发送WS握手认证信息
-  TCP接口.readable.pipeTo(
-    new WritableStream({
-      //将TCP接口返回的数据通过WS接口发送回客户端【优先建立客户端与CF的WS回传通道，防止初始包返回数据时通道任未建立导致丢失数据】
-      async write(VL数据) {
-        await WS接口.send(VL数据);
-      },
-    })
-  );
-  const 数据流 = new ReadableStream({
-    //监听WS接口数据并发送给数据流
-    async start(控制器) {
-      if (写入初始数据) {
-        控制器.enqueue(写入初始数据);
-        写入初始数据 = null;
-      }
-      WS接口.addEventListener("message", (event) => {
-        控制器.enqueue(event.data);
-      }); //监听客户端WS接口消息，推送给数据流
-      WS接口.addEventListener("close", () => {
-        控制器.close();
-      }); //监听客户端WS接口关闭信息，结束流传输
-      WS接口.addEventListener("error", () => {
-        控制器.close();
-      }); //监听客户端WS接口异常信息，结束流传输
-    },
-  });
-  数据流.pipeTo(
-    new WritableStream({
-      //将客户端接收到的WS数据发往TCP接口
-      async write(VL数据) {
-        await 传输数据.write(VL数据);
-      },
-    })
-  );
+  WS接口.accept(); //打开WS接口连接通道
+  WS接口.send(new Uint8Array([0, 0]).buffer); //向客户端发送WS接口初始化消息
+  const 传输数据 = TCP接口.writable.getWriter(); //打开TCP接口写入通道
+  const 读取数据 = TCP接口.readable.getReader(); //打开TCP接口读取通道
+  if (写入初始数据) await 传输数据.write(写入初始数据); //向TCP接口推送标头中提取的初始访问数据
+  WS接口.addEventListener("message", (event) => {
+    传输数据.write(event.data);
+  }); //监听客户端WS接口后续数据，推送给TCP接口
+  while (true) {
+    let 返回数据 = (await 读取数据.read()).value;
+    if (返回数据) {
+      WS接口.send(返回数据);
+    } else {
+      break;
+    }
+  }
 }
 //////////////////////////////////////////////////////////////////////////SOCKS5部分//////////////////////////////////////////////////////////////////////
 async function 创建SOCKS5接口(识别地址类型, 访问地址, 访问端口) {
@@ -262,18 +239,18 @@ function 生成通用配置(hostName) {
   if (我的优选.length === 0) {
     我的优选 = [`${hostName}:443`];
   }
-  return 我的优选
-    .map((获取优选) => {
-      const [主内容, tls] = 获取优选.split("@");
-      const [地址端口, 节点名字 = 我的节点名字] = 主内容.split("#");
-      const 拆分地址端口 = 地址端口.split(":");
-      const 端口 = 拆分地址端口.length > 1 ? Number(拆分地址端口.pop()) : 443;
-      const 地址 = 拆分地址端口.join(":");
-      const TLS开关 = tls === "notls" ? "security=none" : "security=tls";
-      return `${转码}${转码2}${符号}${哎呀呀这是我的VL密钥}@${地址}:${端口}?encryption=none&${TLS开关}&sni=${hostName}&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#${节点名字}`;
-    })
-    .join("\n");
-}
+    return 我的优选
+      .map((获取优选) => {
+        const [主内容, tls] = 获取优选.split("@");
+        const [地址端口, 节点名字 = 我的节点名字] = 主内容.split("#");
+        const 拆分地址端口 = 地址端口.split(":");
+        const 端口 = 拆分地址端口.length > 1 ? Number(拆分地址端口.pop()) : 443;
+        const 地址 = 拆分地址端口.join(":");
+        const TLS开关 = tls === "notls" ? "security=none" : "security=tls";
+        return `${转码}${转码2}${符号}${哎呀呀这是我的VL密钥}@${地址}:${端口}?encryption=none&${TLS开关}&sni=${hostName}&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#${节点名字}`;
+      })
+      .join("\n");
+  }
 function 生成猫咪配置(hostName) {
   if (我的优选.length === 0) {
     我的优选 = [`${hostName}:443`];
@@ -288,17 +265,17 @@ function 生成猫咪配置(hostName) {
       const TLS开关 = tls === "notls" ? "false" : "true";
       return {
         nodeConfig: `  - name: "${节点名字}-${地址}-${端口}"
-    type: ${转码}${转码2}
-    server: ${地址}
-    port: ${端口}
-    uuid: ${哎呀呀这是我的VL密钥}
-    udp: false
-    tls: ${TLS开关}
-    network: ws
+  type: ${转码}${转码2}
+  server: ${地址}
+  port: ${端口}
+  uuid: ${哎呀呀这是我的VL密钥}
+  udp: false
+  tls: ${TLS开关}
+  network: ws
     servername: ${hostName}
-    ws-opts:
-      path: "/?ed=2560"
-      headers:
+  ws-opts:
+    path: "/?ed=2560"
+    headers:
         Host: ${hostName}`,
         proxyConfig: `      - "${节点名字}-${地址}-${端口}"`,
       };
@@ -315,11 +292,11 @@ proxies:
 ${节点配置}
 proxy-groups:
   - name: "自动选择"
-    type: url-test
+  type: url-test
     url: "https://www.google.com/generate_204"
     interval: 30
     tolerance: 50
-    proxies:
+  proxies:
 ${代理配置}
 rules:
   - GEOIP,CN,DIRECT
