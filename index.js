@@ -28,8 +28,8 @@ export default {
                   const response = await fetch(url);
                   return response.ok
                     ? (await response.text())
-          .split("\n")
-          .map((line) => line.trim())
+                        .split("\n")
+                        .map((line) => line.trim())
                         .filter((line) => line)
                     : [];
                 })
@@ -42,18 +42,18 @@ export default {
         const 用户代理 = 访问请求.headers.get("User-Agent").toLowerCase();
         const 配置生成器 = {
           v2ray: 生成通用配置,
-          clash: 生成猫咪配置
+          clash: 生成猫咪配置,
         };
         const 工具 = Object.keys(配置生成器).find((工具) => 用户代理.includes(工具));
         const 生成配置 = 配置生成器[工具];
         return new Response(生成配置(访问请求.headers.get("Host")), {
-              status: 200,
-              headers: { "Content-Type": "text/plain;charset=utf-8" },
-            });
-          }
-    } else if (读取我的请求标头 === "websocket") {
-        return await 升级WS请求(访问请求);
+          status: 200,
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+        });
       }
+    } else if (读取我的请求标头 === "websocket") {
+      return await 升级WS请求(访问请求);
+    }
   },
 };
 ////////////////////////////////////////////////////////////////////////脚本主要架构//////////////////////////////////////////////////////////////////////
@@ -120,7 +120,7 @@ async function 解析VL标头(VL数据, WS接口, TCP接口) {
           await SOCKS5接口.opened;
         } catch {
           if (反代IP) {
-          let [反代IP地址, 反代IP端口] = 反代IP.split(":");
+            let [反代IP地址, 反代IP端口] = 反代IP.split(":");
             TCP接口 = connect({ hostname: 反代IP地址, port: 反代IP端口 || 访问端口 });
           }
         }
@@ -239,18 +239,18 @@ function 生成通用配置(hostName) {
   if (我的优选.length === 0) {
     我的优选 = [`${hostName}:443`];
   }
-    return 我的优选
-      .map((获取优选) => {
-        const [主内容, tls] = 获取优选.split("@");
-        const [地址端口, 节点名字 = 我的节点名字] = 主内容.split("#");
-        const 拆分地址端口 = 地址端口.split(":");
-        const 端口 = 拆分地址端口.length > 1 ? Number(拆分地址端口.pop()) : 443;
-        const 地址 = 拆分地址端口.join(":");
-        const TLS开关 = tls === "notls" ? "security=none" : "security=tls";
-        return `${转码}${转码2}${符号}${哎呀呀这是我的VL密钥}@${地址}:${端口}?encryption=none&${TLS开关}&sni=${hostName}&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#${节点名字}`;
-      })
-      .join("\n");
-  }
+  return 我的优选
+    .map((获取优选) => {
+      const [主内容, tls] = 获取优选.split("@");
+      const [地址端口, 节点名字 = 我的节点名字] = 主内容.split("#");
+      const 拆分地址端口 = 地址端口.split(":");
+      const 端口 = 拆分地址端口.length > 1 ? Number(拆分地址端口.pop()) : 443;
+      const 地址 = 拆分地址端口.join(":");
+      const TLS开关 = tls === "notls" ? "security=none" : "security=tls";
+      return `${转码}${转码2}${符号}${哎呀呀这是我的VL密钥}@${地址}:${端口}?encryption=none&${TLS开关}&sni=${hostName}&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#${节点名字}`;
+    })
+    .join("\n");
+}
 function 生成猫咪配置(hostName) {
   if (我的优选.length === 0) {
     我的优选 = [`${hostName}:443`];
