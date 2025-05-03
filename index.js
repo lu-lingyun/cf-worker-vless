@@ -265,17 +265,17 @@ function 生成猫咪配置(hostName) {
       const TLS开关 = tls === "notls" ? "false" : "true";
       return {
         nodeConfig: `  - name: "${节点名字}-${地址}-${端口}"
-  type: ${转码}${转码2}
-  server: ${地址}
-  port: ${端口}
-  uuid: ${哎呀呀这是我的VL密钥}
-  udp: false
-  tls: ${TLS开关}
-  network: ws
+    type: ${转码}${转码2}
+    server: ${地址}
+    port: ${端口}
+    uuid: ${哎呀呀这是我的VL密钥}
+    udp: false
+    tls: ${TLS开关}
+    network: ws
     servername: ${hostName}
-  ws-opts:
-    path: "/?ed=2560"
-    headers:
+    ws-opts:
+      path: "/?ed=2560"
+      headers:
         Host: ${hostName}`,
         proxyConfig: `      - "${节点名字}-${地址}-${端口}"`,
       };
@@ -292,11 +292,11 @@ proxies:
 ${节点配置}
 proxy-groups:
   - name: "自动选择"
-  type: url-test
+    type: url-test
     url: "https://www.google.com/generate_204"
     interval: 30
     tolerance: 50
-  proxies:
+    proxies:
 ${代理配置}
 rules:
   - GEOIP,CN,DIRECT
