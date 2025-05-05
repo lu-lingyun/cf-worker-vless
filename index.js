@@ -28,9 +28,9 @@ export default {
                   const response = await fetch(url);
                   return response.ok
                     ? (await response.text())
-                        .split("\n")
-                        .map((line) => line.trim())
-                        .filter((line) => line)
+                      .split("\n")
+                      .map((line) => line.trim())
+                      .filter((line) => line)
                     : [];
                 })
               )
@@ -145,19 +145,19 @@ async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
   // 建立连接和初始化
   WS接口.accept();
   await WS接口.send(new Uint8Array([0, 0]).buffer);
-  
+
   // 获取TCP流读写器
   const 传输数据 = TCP接口.writable.getWriter();
   const 读取数据 = TCP接口.readable.getReader();
-  
+
   // 写入初始数据（如果有）
   if (写入初始数据) await 传输数据.write(写入初始数据);
-  
+
   // WebSocket消息转发到TCP
   WS接口.addEventListener("message", async (event) => {
     await 传输数据.write(event.data);
   });
-  
+
   // TCP数据转发到WebSocket
   (async () => {
     while (true) {
