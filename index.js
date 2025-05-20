@@ -141,7 +141,7 @@ for (let i = 0; i < 256; ++i) {
   转换密钥格式.push((i + 256).toString(16).slice(1));
 }
 //第三步，创建客户端WS-CF-目标的传输通道并监听状态
-async function 建立传输管道(WS接口, TCP接口, 写入初始数据, 写入队列 = Promise.resolve(), 回写队列 = Promise.resolve(), 累计字节数 = 0, 最大传输字节数 = 6*1024*1024 ) {
+async function 建立传输管道(WS接口, TCP接口, 写入初始数据, 写入队列 = Promise.resolve(), 回写队列 = Promise.resolve(), 累计字节数 = 0, 最大传输字节数 = 6 * 1024 * 1024) {
   WS接口.accept(); //打开WS接口连接通道
   WS接口.send(new Uint8Array([0, 0]).buffer); //向客户端发送WS接口初始化消息
   const 传输数据 = TCP接口.writable.getWriter(); //打开TCP接口写入通道
