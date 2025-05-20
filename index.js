@@ -141,31 +141,29 @@ for (let i = 0; i < 256; ++i) {
   转换密钥格式.push((i + 256).toString(16).slice(1));
 }
 //第三步，创建客户端WS-CF-目标的传输通道并监听状态
-async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
-  // 建立连接和初始化
-  WS接口.accept();
-  await WS接口.send(new Uint8Array([0, 0]).buffer);
-
-  // 获取TCP流读写器
-  const 传输数据 = TCP接口.writable.getWriter();
-  const 读取数据 = TCP接口.readable.getReader();
-
-  // 写入初始数据（如果有）
-  if (写入初始数据) await 传输数据.write(写入初始数据);
-
-  // WebSocket消息转发到TCP
-  WS接口.addEventListener("message", async (event) => {
-    await 传输数据.write(event.data);
-  });
-
-  // TCP数据转发到WebSocket
-  (async () => {
-    while (true) {
-      const { value: 返回数据, done } = await 读取数据.read();
-      if (done) break;
-      if (返回数据) await WS接口.send(返回数据);
+async function 建立传输管道(WS接口, TCP接口, 写入初始数据, 写入队列 = Promise.resolve(), 回写队列 = Promise.resolve(), 累计字节数 = 0, 最大传输字节数 = 6*1024*1024 ) {
+  WS接口.accept(); //打开WS接口连接通道
+  WS接口.send(new Uint8Array([0, 0]).buffer); //向客户端发送WS接口初始化消息
+  const 传输数据 = TCP接口.writable.getWriter(); //打开TCP接口写入通道
+  const 读取数据 = TCP接口.readable.getReader(); //打开TCP接口读取通道
+  if (写入初始数据) 写入队列 = 写入队列.then(() => 传输数据.write(写入初始数据)).catch(); //向TCP接口推送标头中提取的初始访问数据
+  WS接口.addEventListener('message', event => 写入队列 = 写入队列.then(() => 传输数据.write(event.data)).catch()); //监听客户端WS接口后续数据，推送给TCP接口
+  while (true) {
+    const { value: 返回数据, done: 流结束 } = await 读取数据.read(); //读取TCP返回数据，推送给WS接口
+    if (流结束 || !返回数据) break;
+    if (返回数据.length > 0) {
+      累计字节数 += 返回数据.length;
+      回写队列 = 回写队列.then(() => WS接口.send(返回数据)).catch();
+      if (累计字节数 >= 最大传输字节数) {
+        try {
+          await 回写队列;
+        } finally {
+          WS接口.close(1013); //主动关闭客户端并告诉客户端立即自动重连，不一定所有客户端都能识别，可尝试1000或1013状态码
+        }
+        break;
+      }
     }
-  })();
+  }
 }
 //////////////////////////////////////////////////////////////////////////SOCKS5部分//////////////////////////////////////////////////////////////////////
 async function 创建SOCKS5接口(识别地址类型, 访问地址, 访问端口) {
