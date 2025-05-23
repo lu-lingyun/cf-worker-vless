@@ -30,7 +30,7 @@ export default {
                     ? (await response.text())
                       .split("\n")
                       .map((line) => line.trim())
-                      .filter((line) => line)
+                      .filter(Boolean)
                     : [];
                 })
               )
