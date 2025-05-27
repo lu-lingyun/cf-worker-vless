@@ -106,6 +106,7 @@ async function 解析VL标头(VL数据, WS接口, TCP接口) {
 
   try {
     TCP接口 = await connect({ hostname: 访问地址, port: 访问端口 });
+    await TCP接口.opened;
   } catch {
     const NAT64地址 = 识别地址类型 === 1
       ? 转换IPv4到NAT64(访问地址)
@@ -113,7 +114,6 @@ async function 解析VL标头(VL数据, WS接口, TCP接口) {
     TCP接口 = await connect({ hostname: NAT64地址, port: 访问端口 });
   }
 
-  await TCP接口.opened;
   建立传输管道(WS接口, TCP接口, 写入初始数据);
 }
 
