@@ -126,7 +126,7 @@ function 转换IPv4到NAT64(ipv4地址) {
 
 // 解析域名到IPv4地址
 async function 解析域名到IPv4(域名) {
-  const 响应 = await fetch(`https://1.1.1.1/dns-query?name=${域名}&type=A`, {
+  const 响应 = await fetch(`https://cloudflare-dns.com/dns-query?name=${域名}&type=A`, {
     headers: { "Accept": "application/dns-json" }
   });
   const 结果 = await 响应.json();
