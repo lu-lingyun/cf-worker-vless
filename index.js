@@ -120,44 +120,17 @@ async function 解析VL标头(VL数据, WS接口, TCP接口) {
 // 将IPv4地址转换为NAT64 IPv6地址
 function 转换IPv4到NAT64(ipv4地址) {
   const 部分 = ipv4地址.split(".");
-  if (部分.length !== 4) {
-    throw new Error("无效的IPv4地址");
-  }
-
-  // 将每个部分转换为16进制
-  const 十六进制 = 部分.map(段 => {
-    const 数字 = parseInt(段, 10);
-    if (数字 < 0 || 数字 > 255) {
-      throw new Error("无效的IPv4地址段");
-    }
-    return 数字.toString(16).padStart(2, "0");
-  });
-
-  // 构造NAT64 IPv6地址：2001:67c:2960:6464::xxxx:xxxx
+  const 十六进制 = 部分.map(段 => parseInt(段, 10).toString(16).padStart(2, "0"));
   return `[2001:67c:2960:6464::${十六进制[0]}${十六进制[1]}:${十六进制[2]}${十六进制[3]}]`;
 }
 
 // 解析域名到IPv4地址
 async function 解析域名到IPv4(域名) {
-  try {
-    const 响应 = await fetch(`https://1.1.1.1/dns-query?name=${域名}&type=A`, {
-      headers: {
-        "Accept": "application/dns-json"
-      }
-    });
-
-    const 结果 = await 响应.json();
-    if (结果.Answer && 结果.Answer.length > 0) {
-      // 找到第一个A记录
-      const A记录 = 结果.Answer.find(记录 => 记录.type === 1);
-      if (A记录) {
-        return A记录.data;
-      }
-    }
-    throw new Error("无法解析域名的IPv4地址");
-  } catch (错误) {
-    throw new Error(`DNS解析失败: ${错误.message}`);
-  }
+  const 响应 = await fetch(`https://1.1.1.1/dns-query?name=${域名}&type=A`, {
+    headers: { "Accept": "application/dns-json" }
+  });
+  const 结果 = await 响应.json();
+  return 结果.Answer.find(记录 => 记录.type === 1).data;
 }
 
 function 验证VL的密钥(arr, offset = 0) {
