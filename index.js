@@ -105,41 +105,16 @@ async function 解析VL标头(VL数据, WS接口, TCP接口) {
   const 写入初始数据 = VL数据.slice(地址信息索引 + 地址长度);
 
   try {
-    // 尝试直接连接
     TCP接口 = await connect({ hostname: 访问地址, port: 访问端口 });
-    await TCP接口.opened;
-    建立传输管道(WS接口, TCP接口, 写入初始数据);
-  } catch (直接连接错误) {
-    console.log("直接连接失败，尝试NAT64 IPv6转换...");
-
-    // 转换为NAT64 IPv6地址
-    let NAT64地址;
-    if (识别地址类型 === 1) {
-      // IPv4地址直接转换
-      NAT64地址 = 转换IPv4到NAT64(访问地址);
-    } else if (识别地址类型 === 2) {
-      // 域名需要先解析IPv4
-      try {
-        const ipv4 = await 解析域名到IPv4(访问地址);
-        NAT64地址 = 转换IPv4到NAT64(ipv4);
-      } catch (解析错误) {
-        console.error("域名解析失败:", 解析错误);
-        return;
-      }
-    } else {
-      console.error("不支持的地址类型");
-      return;
-    }
-
-    try {
-      // 使用NAT64 IPv6地址连接
-      TCP接口 = await connect({ hostname: NAT64地址, port: 访问端口 });
-      await TCP接口.opened;
-      建立传输管道(WS接口, TCP接口, 写入初始数据);
-    } catch (NAT64错误) {
-      console.error("NAT64连接失败:", NAT64错误);
-    }
+  } catch {
+    const NAT64地址 = 识别地址类型 === 1
+      ? 转换IPv4到NAT64(访问地址)
+      : 转换IPv4到NAT64(await 解析域名到IPv4(访问地址));
+    TCP接口 = await connect({ hostname: NAT64地址, port: 访问端口 });
   }
+
+  await TCP接口.opened;
+  建立传输管道(WS接口, TCP接口, 写入初始数据);
 }
 
 // 将IPv4地址转换为NAT64 IPv6地址
