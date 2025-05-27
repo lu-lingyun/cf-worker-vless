@@ -126,11 +126,10 @@ function 转换IPv4到NAT64(ipv4地址) {
 
 // 解析域名到IPv4地址
 async function 解析域名到IPv4(域名) {
-  const 响应 = await fetch(`https://cloudflare-dns.com/dns-query?name=${域名}&type=A`, {
+  const { Answer } = await (await fetch(`https://cloudflare-dns.com/dns-query?name=${域名}&type=A`, {
     headers: { "Accept": "application/dns-json" }
-  });
-  const 结果 = await 响应.json();
-  return 结果.Answer.find(记录 => 记录.type === 1).data;
+  })).json();
+  return Answer.find(({ type }) => type === 1).data;
 }
 
 function 验证VL的密钥(arr, offset = 0) {
