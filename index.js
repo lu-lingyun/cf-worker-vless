@@ -11,49 +11,49 @@ let 我的节点名字 = "水灵"; // 节点名字
 
 //////////////////////////////////////////////////////////////////////////网页入口////////////////////////////////////////////////////////////////////////
 export default {
-  async fetch(访问请求, env) {
-    const 读取我的请求标头 = 访问请求.headers.get("Upgrade");
-    const url = new URL(访问请求.url);
-    if (!读取我的请求标头 || 读取我的请求标头 !== "websocket") {
-      if (我的优选TXT.length > 0) {
-        我的优选 = [
-          ...new Set(
-            (
-              await Promise.all(
-                我的优选TXT.map(async (url) => {
-                  const response = await fetch(url);
-                  return response.ok
-                    ? (await response.text())
-                      .split("\n")
-                      .map((line) => line.trim())
-                      .filter(Boolean)
-                    : [];
-                })
-              )
-            ).flat()
-          ),
-        ];
-      }
-      if (url.pathname === `/${哎呀呀这是我的ID啊}`) {
-        const 用户代理 = 访问请求.headers.get("User-Agent").toLowerCase();
-        const 配置生成器 = {
-          v2ray: 生成通用配置,
-          clash: 生成猫咪配置,
-        };
-        const 工具 = Object.keys(配置生成器).find((工具) => 用户代理.includes(工具));
-        if (工具) {
+  async fetch(访问请求) {
+    try {
+      const 读取我的请求标头 = 访问请求.headers.get("Upgrade");
+      const url = new URL(访问请求.url);
+      if (!读取我的请求标头 || 读取我的请求标头 !== "websocket") {
+        if (我的优选TXT.length > 0) {
+          我的优选 = [
+            ...new Set(
+              (
+                await Promise.all(
+                  我的优选TXT.map(async (url) => {
+                    const response = await fetch(url);
+                    return response.ok
+                      ? (await response.text())
+                        .split("\n")
+                        .map((line) => line.trim())
+                        .filter(Boolean)
+                      : [];
+                  })
+                )
+              ).flat()
+            ),
+          ];
+        }
+        if (url.pathname === `/${哎呀呀这是我的ID啊}`) {
+          const 用户代理 = 访问请求.headers.get("User-Agent").toLowerCase();
+          const 配置生成器 = {
+            v2ray: 生成通用配置,
+            clash: 生成猫咪配置,
+          };
+          const 工具 = Object.keys(配置生成器).find((工具) => 用户代理.includes(工具));
           const 生成配置 = 配置生成器[工具];
           return new Response(生成配置(访问请求.headers.get("Host")), {
             status: 200,
             headers: { "Content-Type": "text/plain;charset=utf-8" },
           });
         }
-        return new Response(null, { status: 404 });
+      } else if (读取我的请求标头 === "websocket") {
+        return await 升级WS请求(访问请求);
       }
-    } else if (读取我的请求标头 === "websocket") {
-      return await 升级WS请求(访问请求);
+    } catch {
+      return new Response(null, { status: 404 });
     }
-    return new Response(null, { status: 404 });
   },
 };
 ////////////////////////////////////////////////////////////////////////脚本主要架构//////////////////////////////////////////////////////////////////////
