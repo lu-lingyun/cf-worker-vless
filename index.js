@@ -41,11 +41,14 @@ export default {
           clash: 生成猫咪配置,
         };
         const 工具 = Object.keys(配置生成器).find((工具) => 用户代理.includes(工具));
-        const 生成配置 = 配置生成器[工具];
-        return new Response(生成配置(访问请求.headers.get("Host")), {
-          status: 200,
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-        });
+        if (工具) {
+          const 生成配置 = 配置生成器[工具];
+          return new Response(生成配置(访问请求.headers.get("Host")), {
+            status: 200,
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+          });
+        }
+        return new Response(null, { status: 404 });
       }
     } else if (读取我的请求标头 === "websocket") {
       return await 升级WS请求(访问请求);
