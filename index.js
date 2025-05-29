@@ -51,6 +51,7 @@ export default {
       } else if (读取我的请求标头 === "websocket") {
         return await 升级WS请求(访问请求);
       }
+      return new Response(null, { status: 404 });
     } catch {
       return new Response(null, { status: 404 });
     }
