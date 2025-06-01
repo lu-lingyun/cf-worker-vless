@@ -215,7 +215,7 @@ function 生成猫咪配置(hostName) {
       const 地址 = 拆分地址端口.join(":").replace(/^\[|\]/g, "");
       const TLS开关 = tls === "notls" ? "false" : "true";
       return {
-        nodeConfig: `  - name: "${节点名字}-${地址}-${端口}"
+        nodeConfig: `  - name: "${节点名字}"
     type: ${转码}${转码2}
     server: ${地址}
     port: ${端口}
@@ -228,7 +228,7 @@ function 生成猫咪配置(hostName) {
       path: "/?ed=2560"
       headers:
         Host: ${hostName}`,
-        proxyConfig: `      - "${节点名字}-${地址}-${端口}"`,
+        proxyConfig: `      - "${节点名字}"`,
       };
     });
   };
