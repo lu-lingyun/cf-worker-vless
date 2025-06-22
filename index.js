@@ -124,7 +124,7 @@ async function 解析VL标头(VL数据, WS接口, TCP接口) {
 
 // 将IPv4地址转换为NAT64 IPv6地址
 function 转换IPv4到NAT64(ipv4地址) {
-  const 十六进制 = ipv4地址.split(".").map(段 => parseInt(段, 10).toString(16).padStart(2, "0"));
+  const 十六进制 = ipv4地址.split(".").map(段 => parseInt(段).toString(16).padStart(2, "0"));
   return `[2001:67c:2960:6464::${十六进制[0]}${十六进制[1]}:${十六进制[2]}${十六进制[3]}]`;
 }
 
@@ -133,7 +133,7 @@ async function 解析域名到IPv4(域名) {
   const { Answer } = await fetch(`https://cloudflare-dns.com/dns-query?name=${域名}&type=A`, {
     headers: { "Accept": "application/dns-json" }
   }).then(res => res.json());
-  return Answer.find(({ type }) => type === 1).data;
+  return Answer[0].data;
 }
 
 function 验证VL的密钥(arr, offset = 0) {
