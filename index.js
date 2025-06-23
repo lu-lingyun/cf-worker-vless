@@ -60,10 +60,11 @@ export default {
 ////////////////////////////////////////////////////////////////////////脚本主要架构//////////////////////////////////////////////////////////////////////
 //第一步，读取和构建基础访问结构
 async function 升级WS请求(访问请求) {
-  const [客户端, WS接口] = new WebSocketPair(); //创建WS接口对象
+  const 创建WS接口 = new WebSocketPair();
+  const [客户端, WS接口] = Object.values(创建WS接口);
   const 读取我的加密访问内容数据头 = 访问请求.headers.get("sec-websocket-protocol"); //读取访问标头中的WS通信数据
   const 解密数据 = 使用64位加解密(读取我的加密访问内容数据头); //解密目标访问数据，传递给TCP握手进程
-  await 解析VL标头(解密数据, WS接口); //解析VL数据并进行TCP握手
+  解析VL标头(解密数据, WS接口); //解析VL数据并进行TCP握手
   return new Response(null, { status: 101, webSocket: 客户端 }); //一切准备就绪后，回复客户端WS连接升级成功
 }
 function 使用64位加解密(还原混淆字符) {
@@ -73,6 +74,7 @@ function 使用64位加解密(还原混淆字符) {
   return 解密_你_个_丁咚_咙_咚呛.buffer;
 }
 //第二步，解读VL协议数据，创建TCP握手
+let 访问地址, 访问端口;
 async function 解析VL标头(VL数据, WS接口, TCP接口) {
   if (验证VL的密钥(new Uint8Array(VL数据.slice(1, 17))) !== 哎呀呀这是我的VL密钥) {
     return null;
@@ -80,12 +82,11 @@ async function 解析VL标头(VL数据, WS接口, TCP接口) {
   const 获取数据定位 = new Uint8Array(VL数据)[17];
   const 提取端口索引 = 18 + 获取数据定位 + 1;
   const 建立端口缓存 = VL数据.slice(提取端口索引, 提取端口索引 + 2);
-  const 访问端口 = new DataView(建立端口缓存).getUint16(0);
+  访问端口 = new DataView(建立端口缓存).getUint16(0);
   const 提取地址索引 = 提取端口索引 + 2;
   const 建立地址缓存 = new Uint8Array(VL数据.slice(提取地址索引, 提取地址索引 + 1));
   const 识别地址类型 = 建立地址缓存[0];
   let 地址长度 = 0;
-  let 访问地址 = "";
   let 地址信息索引 = 提取地址索引 + 1;
   switch (识别地址类型) {
     case 1:
@@ -101,9 +102,7 @@ async function 解析VL标头(VL数据, WS接口, TCP接口) {
       地址长度 = 16;
       const dataView = new DataView(VL数据.slice(地址信息索引, 地址信息索引 + 地址长度));
       const ipv6 = [];
-      for (let i = 0; i < 8; i++) {
-        ipv6.push(dataView.getUint16(i * 2).toString(16));
-      }
+      for (let i = 0; i < 8; i++) { ipv6.push(dataView.getUint16(i * 2).toString(16)); }
       访问地址 = ipv6.join(":");
       break;
   }
@@ -149,9 +148,7 @@ for (let i = 0; i < 256; ++i) {
 async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
   // 建立WebSocket连接并发送初始化消息
   WS接口.accept();
-  await WS接口.send(new Uint8Array([0, 0]).buffer);
-
-  // 获取TCP流读写器
+  WS接口.send(new Uint8Array([0, 0]));
   const 传输数据 = TCP接口.writable.getWriter();
   const 读取数据 = TCP接口.readable.getReader();
 
@@ -173,9 +170,9 @@ async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
   })();
 
   // 保活机制
-  setInterval(async () => {
-    await 传输数据.write(new Uint8Array([0]));
-    await WS接口.send(new Uint8Array([0]));
+  setInterval(() => {
+    传输数据.write(new Uint8Array([0]));
+    WS接口.send(new Uint8Array([0]));
   }, 10000);
 }
 
