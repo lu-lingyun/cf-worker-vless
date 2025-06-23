@@ -156,16 +156,14 @@ async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
   if (写入初始数据) await 传输数据.write(写入初始数据);
 
   // WebSocket消息转发到TCP
-  WS接口.addEventListener("message", async (event) => {
-    await 传输数据.write(event.data);
+  WS接口.addEventListener("message", (event) => {
+    传输数据.write(event.data);
   });
 
   // TCP数据转发到WebSocket
   (async () => {
-    while (true) {
-      const { value: 返回数据, done } = await 读取数据.read();
-      if (done) break;
-      if (返回数据) await WS接口.send(返回数据);
+    for await (const 返回数据 of 读取数据) {
+      WS接口.send(返回数据);
     }
   })();
 
