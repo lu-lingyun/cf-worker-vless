@@ -232,23 +232,10 @@ function 生成猫咪配置(hostName) {
     .join("\n");
   return `
 dns:
-  enable: true
-  ipv6: true
-
-  default-nameserver:
-    - 8.8.8.8
-    - 1.1.1.1
-
-  listen: 0.0.0.0:1053
-  use-hosts: true
-  enhanced-mode: fake-ip
-  fake-ip-range: 198.18.0.1/16
-  fake-ip-filter:
-    - "*.lan"
-
   nameserver:
-    - 8.8.8.8
-    - 1.0.0.1
+    - https://doh.pub/dns-query
+  fallback:
+    - https://8.8.8.8/dns-query
 
 proxies:
 ${节点配置}
