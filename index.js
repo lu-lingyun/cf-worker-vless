@@ -152,8 +152,8 @@ async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
   const 传输数据 = TCP接口.writable.getWriter();
   const 读取数据 = TCP接口.readable.getReader();
 
-  // 写入初始数据（如果有）
-  传输数据.write(写入初始数据);
+  // 写入初始数据
+  await 传输数据.write(写入初始数据);
 
   // WebSocket消息转发到TCP
   WS接口.addEventListener("message", (event) => {
@@ -162,7 +162,11 @@ async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
 
   // TCP数据转发到WebSocket
   (async () => {
-    while (true) WS接口.send((await 读取数据.read()).value);
+    while (true) {
+      const { value, done } = await 读取数据.read();
+      if (done) break;
+      WS接口.send(value);
+    }
   })();
 
   // 保活机制
