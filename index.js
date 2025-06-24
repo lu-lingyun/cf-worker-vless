@@ -167,8 +167,8 @@ async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
 
   // 保活机制
   setInterval(() => {
-    传输数据.write(new Uint8Array([0]));
-    WS接口.send(new Uint8Array([0]));
+    传输数据.write(new Uint8Array(0));
+    WS接口.send(new Uint8Array(0));
   }, 5000);
 }
 
