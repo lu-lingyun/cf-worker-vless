@@ -17,23 +17,21 @@ export default {
       const url = new URL(访问请求.url);
       if (!读取我的请求标头 || 读取我的请求标头 !== "websocket") {
         if (我的优选TXT.length > 0) {
-          我的优选 = [
-            ...new Set(
-              (
-                await Promise.all(
-                  我的优选TXT.map(async (url) => {
-                    const response = await fetch(url);
-                    return response.ok
-                      ? (await response.text())
-                        .split("\n")
-                        .map((line) => line.trim())
-                        .filter(Boolean)
-                      : [];
-                  })
-                )
-              ).flat()
-            ),
-          ];
+          const 唯一值集合 = new Set();
+
+          for (const 文本地址 of 我的优选TXT) {
+            const 响应 = await fetch(文本地址);
+            const 文本内容 = await 响应.text();
+            const 行数组 = 文本内容.split("\n")
+              .map(行 => 行.trim())
+              .filter(行 => 行);
+
+            for (const 行 of 行数组) {
+              唯一值集合.add(行);
+            }
+          }
+
+          我的优选 = Array.from(唯一值集合);
         }
         if (url.pathname === `/${哎呀呀这是我的ID啊}`) {
           const 用户代理 = 访问请求.headers.get("User-Agent").toLowerCase();
