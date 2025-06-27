@@ -161,7 +161,7 @@ async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
   const 读取数据 = TCP接口.readable.getReader();
 
   // 写入初始数据
-  await 传输数据.write(写入初始数据);
+  传输数据.write(写入初始数据);
 
   // WebSocket消息转发到TCP
   WS接口.addEventListener("message", (event) => {
