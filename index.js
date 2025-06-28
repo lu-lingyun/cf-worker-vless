@@ -22,9 +22,7 @@ export default {
           for (const 文本地址 of 我的优选TXT) {
             const 响应 = await fetch(文本地址);
             const 文本内容 = await 响应.text();
-            const 行数组 = 文本内容.split("\n")
-              .map(行 => 行.trim())
-              .filter(行 => 行);
+            const 行数组 = 文本内容.split("\n").map(行 => 行.trim()).filter(行 => 行);
 
             for (const 行 of 行数组) {
               唯一值集合.add(行);
