@@ -22,7 +22,10 @@ export default {
           for (const 文本地址 of 我的优选TXT) {
             const 响应 = await fetch(文本地址);
             const 文本内容 = await 响应.text();
-            const 行数组 = 文本内容.split("\n").map(行 => 行.trim()).filter(行 => 行);
+            const 行数组 = 文本内容
+              .split("\n")
+              .map((行) => 行.trim())
+              .filter((行) => 行);
 
             for (const 行 of 行数组) {
               唯一值集合.add(行);
@@ -98,7 +101,9 @@ async function 解析VL标头(VL数据, WS接口, TCP接口) {
       地址长度 = 16;
       const dataView = new DataView(VL数据.slice(地址信息索引, 地址信息索引 + 地址长度));
       const ipv6 = [];
-      for (let i = 0; i < 8; i++) { ipv6.push(dataView.getUint16(i * 2).toString(16)); }
+      for (let i = 0; i < 8; i++) {
+        ipv6.push(dataView.getUint16(i * 2).toString(16));
+      }
       访问地址 = ipv6.join(":");
       break;
   }
@@ -108,9 +113,7 @@ async function 解析VL标头(VL数据, WS接口, TCP接口) {
     TCP接口 = connect({ hostname: 访问地址, port: 访问端口, allowHalfOpen: true });
     await TCP接口.opened;
   } catch {
-    const NAT64地址 = 识别地址类型 === 1
-      ? 转换IPv4到NAT64(访问地址)
-      : await 解析域名到IPv4(访问地址);
+    const NAT64地址 = 识别地址类型 === 1 ? 转换IPv4到NAT64(访问地址) : await 解析域名到IPv4(访问地址);
     TCP接口 = connect({ hostname: NAT64地址, port: 访问端口, allowHalfOpen: true });
   }
 
@@ -120,7 +123,7 @@ async function 解析VL标头(VL数据, WS接口, TCP接口) {
 // 将IPv4地址转换为NAT64 IPv6地址
 function 转换IPv4到NAT64(IPv4地址) {
   const 地址段 = IPv4地址.split(".");
-  const 十六进制段 = 地址段.map(段 => {
+  const 十六进制段 = 地址段.map((段) => {
     const 数字 = parseInt(段, 10);
     return 数字.toString(16).padStart(2, "0");
   });
@@ -131,12 +134,12 @@ function 转换IPv4到NAT64(IPv4地址) {
 async function 解析域名到IPv4(域名) {
   const DNS查询 = await fetch(`https://cloudflare-dns.com/dns-query?name=${域名}&type=A`, {
     headers: {
-      "Accept": "application/dns-json"
-    }
+      Accept: "application/dns-json",
+    },
   });
 
   const DNS结果 = await DNS查询.json();
-  const A记录 = DNS结果.Answer.find(记录 => 记录.type === 1);
+  const A记录 = DNS结果.Answer.find((记录) => 记录.type === 1);
   const IPv4地址 = A记录.data;
   return 转换IPv4到NAT64(IPv4地址);
 }
