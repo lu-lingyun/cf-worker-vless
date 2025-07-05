@@ -262,6 +262,7 @@ proxy-groups:
 ${代理配置}
 rules:
   - GEOIP,CN,DIRECT
+  - GEOSITE,CN,DIRECT
   - MATCH,自动选择
 `;
 }
