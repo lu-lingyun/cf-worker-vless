@@ -17,7 +17,7 @@ export default {
       const url = new URL(访问请求.url);
       if (!读取我的请求标头 || 读取我的请求标头 !== "websocket") {
         if (我的优选TXT.length > 0) {
-          const 唯一值集合 = new Set();
+          const 唯一值集合 = new Set(我的优选);
 
           for (const 文本地址 of 我的优选TXT) {
             const 响应 = await fetch(文本地址);
@@ -27,9 +27,7 @@ export default {
               .map((行) => 行.trim())
               .filter((行) => 行);
 
-            for (const 行 of 行数组) {
-              唯一值集合.add(行);
-            }
+            行数组.forEach((行) => 唯一值集合.add(行));
           }
 
           我的优选 = Array.from(唯一值集合);
