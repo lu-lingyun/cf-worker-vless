@@ -130,7 +130,7 @@ function 转换IPv4到NAT64(IPv4地址) {
 
 // 获取域名的IPv4地址并转换为NAT64 IPv6地址
 async function 解析域名到IPv4(域名) {
-  const DNS查询 = await fetch(`https://cloudflare-dns.com/dns-query?name=${域名}&type=A`, {
+  const DNS查询 = await fetch(`https://1.1.1.1/dns-query?name=${域名}&type=A`, {
     headers: {
       Accept: "application/dns-json",
     },
