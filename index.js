@@ -121,10 +121,20 @@ async function 解析VL标头(VL数据, WS接口, TCP接口) {
 // 将IPv4地址转换为NAT64 IPv6地址
 function 转换IPv4到NAT64(IPv4地址) {
   const 地址段 = IPv4地址.split(".");
+  if (地址段.length !== 4) {
+    throw new Error("无效的IPv4地址");
+  }
+
+  // 将每个部分转换为16进制
   const 十六进制段 = 地址段.map((段) => {
     const 数字 = parseInt(段, 10);
+    if (数字 < 0 || 数字 > 255) {
+      throw new Error("无效的IPv4地址段");
+    }
     return 数字.toString(16).padStart(2, "0");
   });
+
+  // 构造NAT64 IPv6地址：2001:67c:2960:6464::xxxx:xxxx
   return `[2001:67c:2960:6464::${十六进制段[0]}${十六进制段[1]}:${十六进制段[2]}${十六进制段[3]}]`;
 }
 
