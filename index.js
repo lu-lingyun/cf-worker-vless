@@ -38,7 +38,7 @@ export default {
             v2ray: 生成通用配置,
             clash: 生成猫咪配置,
           };
-          const 工具 = Object.keys(配置生成器).find((工具) => 用户代理.includes(工具));
+          const 工具 = Object.keys(配置生成器).find((工具) => 用户代理.includes(工具)) || 'v2ray';
           const 生成配置 = 配置生成器[工具];
           return new Response(生成配置(访问请求.headers.get("Host")), {
             status: 200,
