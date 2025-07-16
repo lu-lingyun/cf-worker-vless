@@ -41,7 +41,7 @@ export default {
             clash: 生成猫咪配置,
             default: (host) => btoa(unescape(encodeURIComponent(生成通用配置(host))))
           };
-          const 工具 = Object.keys(配置生成器).find((工具) => 用户代理.includes(工具)) || 'default';
+          const 工具 = Object.keys(配置生成器).find((工具) => 用户代理.includes(工具)) || "default";
           const 生成配置 = 配置生成器[工具];
 
           return new Response(生成配置(主机名), {
@@ -65,7 +65,7 @@ async function 升级WS请求(访问请求) {
   const [客户端, WS接口] = Object.values(创建WS接口);
   const 读取我的加密访问内容数据头 = 访问请求.headers.get("sec-websocket-protocol"); //读取访问标头中的WS通信数据
   const 解密数据 = 使用64位加解密(读取我的加密访问内容数据头); //解密目标访问数据，传递给TCP握手进程
-  解析VL标头(解密数据, WS接口); //解析VL数据并进行TCP握手
+  await 解析VL标头(解密数据, WS接口); //解析VL数据并进行TCP握手
   return new Response(null, { status: 101, webSocket: 客户端 }); //一切准备就绪后，回复客户端WS连接升级成功
 }
 function 使用64位加解密(还原混淆字符) {
@@ -75,7 +75,6 @@ function 使用64位加解密(还原混淆字符) {
   return 解密_你_个_丁咚_咙_咚呛.buffer;
 }
 //第二步，解读VL协议数据，创建TCP握手
-let 访问地址, 访问端口;
 async function 解析VL标头(VL数据, WS接口, TCP接口) {
   if (验证VL的密钥(new Uint8Array(VL数据.slice(1, 17))) !== 哎呀呀这是我的VL密钥) {
     return null;
@@ -83,11 +82,12 @@ async function 解析VL标头(VL数据, WS接口, TCP接口) {
   const 获取数据定位 = new Uint8Array(VL数据)[17];
   const 提取端口索引 = 18 + 获取数据定位 + 1;
   const 建立端口缓存 = VL数据.slice(提取端口索引, 提取端口索引 + 2);
-  访问端口 = new DataView(建立端口缓存).getUint16(0);
+  const 访问端口 = new DataView(建立端口缓存).getUint16(0);
   const 提取地址索引 = 提取端口索引 + 2;
   const 建立地址缓存 = new Uint8Array(VL数据.slice(提取地址索引, 提取地址索引 + 1));
   const 识别地址类型 = 建立地址缓存[0];
   let 地址长度 = 0;
+  let 访问地址 = "";
   let 地址信息索引 = 提取地址索引 + 1;
   switch (识别地址类型) {
     case 1:
@@ -103,9 +103,7 @@ async function 解析VL标头(VL数据, WS接口, TCP接口) {
       地址长度 = 16;
       const dataView = new DataView(VL数据.slice(地址信息索引, 地址信息索引 + 地址长度));
       const ipv6 = [];
-      for (let i = 0; i < 8; i++) {
-        ipv6.push(dataView.getUint16(i * 2).toString(16));
-      }
+      for (let i = 0; i < 8; i++) { ipv6.push(dataView.getUint16(i * 2).toString(16)); }
       访问地址 = ipv6.join(":");
       break;
   }
@@ -161,10 +159,7 @@ function 验证VL的密钥(arr, offset = 0) {
   return uuid;
 }
 const 转换密钥格式 = [];
-for (let i = 0; i < 256; ++i) {
-  转换密钥格式.push((i + 256).toString(16).slice(1));
-}
-
+for (let i = 0; i < 256; ++i) { 转换密钥格式.push((i + 256).toString(16).slice(1)); }
 //第三步，创建客户端WS-CF-目标的传输通道并监听状态
 async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
   // 建立WebSocket连接并发送初始化消息
