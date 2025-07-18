@@ -165,21 +165,56 @@ async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
   // 建立WebSocket连接并发送初始化消息
   WS接口.accept();
   WS接口.send(new Uint8Array([0, 0]));
+
+  // 获取TCP流的读写器
   const 传输数据 = TCP接口.writable.getWriter();
   const 读取数据 = TCP接口.readable.getReader();
 
   // 写入初始数据
-  传输数据.write(写入初始数据);
+  await 传输数据.write(写入初始数据);
 
-  // WebSocket消息转发到TCP
-  WS接口.addEventListener("message", ({ data }) => 传输数据.write(data));
+  // WebSocket→TCP方向带背压的数据转发
+  let isTCPReady = true;
+  const wsMessages = [];
 
-  // TCP数据转发到WebSocket
+  WS接口.addEventListener("message", async ({ data }) => {
+    if (isTCPReady) {
+      isTCPReady = false;
+      await 传输数据.write(data);
+      isTCPReady = true;
+      // 处理积压的消息
+      while (wsMessages.length > 0 && isTCPReady) {
+        isTCPReady = false;
+        await 传输数据.write(wsMessages.shift());
+        isTCPReady = true;
+      }
+    } else {
+      wsMessages.push(data);
+    }
+  });
+
+  // TCP→WebSocket方向带背压的数据转发
+  let isWSReady = true;
+  const tcpMessages = [];
+
   (async () => {
     while (true) {
       const { done, value } = await 读取数据.read();
       if (done) break;
-      WS接口.send(value);
+
+      if (isWSReady) {
+        isWSReady = false;
+        await WS接口.send(value);
+        isWSReady = true;
+        // 处理积压的消息
+        while (tcpMessages.length > 0 && isWSReady) {
+          isWSReady = false;
+          await WS接口.send(tcpMessages.shift());
+          isWSReady = true;
+        }
+      } else {
+        tcpMessages.push(value);
+      }
     }
   })();
 
