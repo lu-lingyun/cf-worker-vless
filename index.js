@@ -163,30 +163,30 @@ for (let i = 0; i < 256; ++i) { 转换密钥格式.push((i + 256).toString(16).s
 //第三步，创建客户端WS-CF-目标的传输通道并监听状态
 async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
   // 建立WebSocket连接并发送初始化消息
-  WS接口.accept();
-  WS接口.send(new Uint8Array([0, 0]));
+  await WS接口.accept();
+  await WS接口.send(new Uint8Array([0, 0]));
   const 传输数据 = TCP接口.writable.getWriter();
   const 读取数据 = TCP接口.readable.getReader();
 
   // 写入初始数据
-  传输数据.write(写入初始数据);
+  await 传输数据.write(写入初始数据);
 
   // WebSocket消息转发到TCP
-  WS接口.addEventListener("message", ({ data }) => 传输数据.write(data));
+  WS接口.addEventListener("message", async ({ data }) => await 传输数据.write(data));
 
   // TCP数据转发到WebSocket
   (async () => {
     while (true) {
       const { done, value } = await 读取数据.read();
       if (done) break;
-      WS接口.send(value);
+      await WS接口.send(value);
     }
   })();
 
   // 保活机制
-  setInterval(() => {
-    传输数据.write(new Uint8Array(0));
-    WS接口.send(new Uint8Array(0));
+  setInterval(async () => {
+    await 传输数据.write(new Uint8Array(0));
+    await WS接口.send(new Uint8Array(0));
   }, 5000);
 }
 
