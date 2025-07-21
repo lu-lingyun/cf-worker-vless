@@ -183,11 +183,13 @@ async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
     }
   })();
 
-  // 保活机制
-  setInterval(async () => {
-    await 传输数据.write(new Uint8Array(0));
-    await WS接口.send(new Uint8Array(0));
-  }, 5000);
+  (async () => {
+    while (true) {
+      await new Promise(resolve => setTimeout(resolve, 5000));
+      await 传输数据.write(new Uint8Array(0));
+      await WS接口.send(new Uint8Array(0));
+    }
+  })();
 }
 
 //////////////////////////////////////////////////////////////////////////订阅页面////////////////////////////////////////////////////////////////////////
