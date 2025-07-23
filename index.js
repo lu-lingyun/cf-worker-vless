@@ -39,7 +39,7 @@ export default {
           const 配置生成器 = {
             v2ray: 生成通用配置,
             clash: 生成猫咪配置,
-            default: (host) => btoa(unescape(encodeURIComponent(生成通用配置(host))))
+            default: (host) => btoa(unescape(encodeURIComponent(生成通用配置(host)))),
           };
           const 工具 = Object.keys(配置生成器).find((工具) => 用户代理.includes(工具)) || "default";
           const 生成配置 = 配置生成器[工具];
@@ -103,7 +103,9 @@ async function 解析VL标头(VL数据, WS接口, TCP接口) {
       地址长度 = 16;
       const dataView = new DataView(VL数据.slice(地址信息索引, 地址信息索引 + 地址长度));
       const ipv6 = [];
-      for (let i = 0; i < 8; i++) { ipv6.push(dataView.getUint16(i * 2).toString(16)); }
+      for (let i = 0; i < 8; i++) {
+        ipv6.push(dataView.getUint16(i * 2).toString(16));
+      }
       访问地址 = ipv6.join(":");
       break;
   }
@@ -159,7 +161,9 @@ function 验证VL的密钥(arr, offset = 0) {
   return uuid;
 }
 const 转换密钥格式 = [];
-for (let i = 0; i < 256; ++i) { 转换密钥格式.push((i + 256).toString(16).slice(1)); }
+for (let i = 0; i < 256; ++i) {
+  转换密钥格式.push((i + 256).toString(16).slice(1));
+}
 //第三步，创建客户端WS-CF-目标的传输通道并监听状态
 async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
   // 建立WebSocket连接并发送初始化消息
@@ -185,7 +189,7 @@ async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
 
   (async () => {
     while (true) {
-      await new Promise(resolve => setTimeout(resolve, 5000));
+      await new Promise((resolve) => setTimeout(resolve, 5000));
       await 传输数据.write(new Uint8Array(0));
       await WS接口.send(new Uint8Array(0));
     }
