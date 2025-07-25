@@ -12,50 +12,46 @@ let 我的节点名字 = "水灵"; // 节点名字
 //////////////////////////////////////////////////////////////////////////网页入口////////////////////////////////////////////////////////////////////////
 export default {
   async fetch(访问请求) {
-    try {
-      const 读取我的请求标头 = 访问请求.headers.get("Upgrade");
-      const url = new URL(访问请求.url);
-      if (!读取我的请求标头 || 读取我的请求标头 !== "websocket") {
-        if (我的优选TXT.length > 0) {
-          const 唯一值集合 = new Set(我的优选);
+    const 读取我的请求标头 = 访问请求.headers.get("Upgrade");
+    const url = new URL(访问请求.url);
+    if (!读取我的请求标头 || 读取我的请求标头 !== "websocket") {
+      if (我的优选TXT.length > 0) {
+        const 唯一值集合 = new Set(我的优选);
 
-          for (const 文本地址 of 我的优选TXT) {
-            const 响应 = await fetch(文本地址);
-            const 文本内容 = await 响应.text();
-            const 行数组 = 文本内容
-              .split("\n")
-              .map((行) => 行.trim())
-              .filter((行) => 行);
+        for (const 文本地址 of 我的优选TXT) {
+          const 响应 = await fetch(文本地址);
+          const 文本内容 = await 响应.text();
+          const 行数组 = 文本内容
+            .split("\n")
+            .map((行) => 行.trim())
+            .filter((行) => 行);
 
-            行数组.forEach((行) => 唯一值集合.add(行));
-          }
-
-          我的优选 = Array.from(唯一值集合);
+          行数组.forEach((行) => 唯一值集合.add(行));
         }
-        if (url.pathname === `/${哎呀呀这是我的ID啊}`) {
-          const 用户代理 = 访问请求.headers.get("User-Agent").toLowerCase();
-          const 主机名 = 访问请求.headers.get("Host");
 
-          const 配置生成器 = {
-            v2ray: 生成通用配置,
-            clash: 生成猫咪配置,
-            default: (host) => btoa(unescape(encodeURIComponent(生成通用配置(host)))),
-          };
-          const 工具 = Object.keys(配置生成器).find((工具) => 用户代理.includes(工具)) || "default";
-          const 生成配置 = 配置生成器[工具];
-
-          return new Response(生成配置(主机名), {
-            status: 200,
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-          });
-        }
-      } else if (读取我的请求标头 === "websocket") {
-        return await 升级WS请求(访问请求);
+        我的优选 = Array.from(唯一值集合);
       }
-      return new Response(null, { status: 404 });
-    } catch {
-      return new Response(null, { status: 404 });
+      if (url.pathname === `/${哎呀呀这是我的ID啊}`) {
+        const 用户代理 = 访问请求.headers.get("User-Agent").toLowerCase();
+        const 主机名 = 访问请求.headers.get("Host");
+
+        const 配置生成器 = {
+          v2ray: 生成通用配置,
+          clash: 生成猫咪配置,
+          default: (host) => btoa(unescape(encodeURIComponent(生成通用配置(host)))),
+        };
+        const 工具 = Object.keys(配置生成器).find((工具) => 用户代理.includes(工具)) || "default";
+        const 生成配置 = 配置生成器[工具];
+
+        return new Response(生成配置(主机名), {
+          status: 200,
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+        });
+      }
+    } else if (读取我的请求标头 === "websocket") {
+      return await 升级WS请求(访问请求);
     }
+    return new Response(null, { status: 404 });
   },
 };
 ////////////////////////////////////////////////////////////////////////脚本主要架构//////////////////////////////////////////////////////////////////////
