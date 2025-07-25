@@ -7,6 +7,8 @@ let 哎呀呀这是我的VL密钥 = "25284107-7424-40a5-8396-cdd0623f4f05"; // U
 let 我的优选 = []; // 节点列表
 let 我的优选TXT = ["https://raw.githubusercontent.com/shulng/shulng/refs/heads/main/ip.txt"]; // 优选TXT路径
 
+let 反代IP = 'ProxyIP.Vultr.CMLiussss.net'
+
 let 我的节点名字 = "水灵"; // 节点名字
 
 //////////////////////////////////////////////////////////////////////////网页入口////////////////////////////////////////////////////////////////////////
@@ -111,8 +113,8 @@ async function 解析VL标头(VL数据, WS接口, TCP接口) {
     TCP接口 = connect({ hostname: 访问地址, port: 访问端口, allowHalfOpen: true });
     await TCP接口.opened;
   } catch {
-    const NAT64地址 = 识别地址类型 === 1 ? 转换IPv4到NAT64(访问地址) : await 解析域名到IPv4(访问地址);
-    TCP接口 = connect({ hostname: NAT64地址, port: 访问端口, allowHalfOpen: true });
+    let [反代IP地址, 反代IP端口] = 反代IP.split(':');
+    TCP接口 = connect({ hostname: 反代IP地址, port: 反代IP端口 || 访问端口, allowHalfOpen: true });
   }
 
   建立传输管道(WS接口, TCP接口, 写入初始数据);
