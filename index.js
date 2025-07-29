@@ -201,7 +201,7 @@ function 生成通用配置(hostName) {
       const 端口 = 拆分地址端口.length > 1 ? Number(拆分地址端口.pop()) : 443;
       const 地址 = 拆分地址端口.join(":");
       const TLS开关 = tls === "notls" ? "security=none" : "security=tls";
-      return `${转码}${转码2}${符号}${哎呀呀这是我的VL密钥}@${地址}:${端口}?encryption=none&${TLS开关}&sni=${hostName}&type=ws&host=${hostName}&path=%2F%3Fed%3D8192#${节点名字}`;
+      return `${转码}${转码2}${符号}${哎呀呀这是我的VL密钥}@${地址}:${端口}?encryption=none&${TLS开关}&sni=${hostName}&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#${节点名字}`;
     })
     .join("\n");
 }
@@ -228,7 +228,7 @@ function 生成猫咪配置(hostName) {
     network: ws
     servername: ${hostName}
     ws-opts:
-      path: "/?ed=8192"
+      path: "/?ed=2560"
       headers:
         Host: ${hostName}`,
         proxyConfig: `      - "${节点名字}-${地址}-${端口}"`,
