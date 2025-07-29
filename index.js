@@ -244,9 +244,9 @@ function 生成猫咪配置(hostName) {
   return `
 dns:
   nameserver:
-    - https://doh.pub/dns-query
+    - 223.5.5.5
   fallback:
-    - https://8.8.8.8/dns-query
+    - 8.8.8.8
 
 proxies:
 ${节点配置}
