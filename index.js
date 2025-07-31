@@ -120,40 +120,6 @@ async function 解析VL标头(VL数据, WS接口, TCP接口) {
   建立传输管道(WS接口, TCP接口, 写入初始数据);
 }
 
-// 将IPv4地址转换为NAT64 IPv6地址
-function 转换IPv4到NAT64(IPv4地址) {
-  const 地址段 = IPv4地址.split(".");
-  if (地址段.length !== 4) {
-    throw new Error("无效的IPv4地址");
-  }
-
-  // 将每个部分转换为16进制
-  const 十六进制段 = 地址段.map((段) => {
-    const 数字 = parseInt(段, 10);
-    if (数字 < 0 || 数字 > 255) {
-      throw new Error("无效的IPv4地址段");
-    }
-    return 数字.toString(16).padStart(2, "0");
-  });
-
-  // 构造NAT64 IPv6地址：2001:67c:2960:6464::xxxx:xxxx
-  return `[2001:67c:2960:6464::${十六进制段[0]}${十六进制段[1]}:${十六进制段[2]}${十六进制段[3]}]`;
-}
-
-// 获取域名的IPv4地址并转换为NAT64 IPv6地址
-async function 解析域名到IPv4(域名) {
-  const DNS查询 = await fetch(`https://1.1.1.1/dns-query?name=${域名}&type=A`, {
-    headers: {
-      Accept: "application/dns-json",
-    },
-  });
-
-  const DNS结果 = await DNS查询.json();
-  const A记录 = DNS结果.Answer.find((记录) => 记录.type === 1);
-  const IPv4地址 = A记录.data;
-  return 转换IPv4到NAT64(IPv4地址);
-}
-
 function 验证VL的密钥(arr, offset = 0) {
   const uuid = (转换密钥格式[arr[offset + 0]] + 转换密钥格式[arr[offset + 1]] + 转换密钥格式[arr[offset + 2]] + 转换密钥格式[arr[offset + 3]] + "-" + 转换密钥格式[arr[offset + 4]] + 转换密钥格式[arr[offset + 5]] + "-" + 转换密钥格式[arr[offset + 6]] + 转换密钥格式[arr[offset + 7]] + "-" + 转换密钥格式[arr[offset + 8]] + 转换密钥格式[arr[offset + 9]] + "-" + 转换密钥格式[arr[offset + 10]] + 转换密钥格式[arr[offset + 11]] + 转换密钥格式[arr[offset + 12]] + 转换密钥格式[arr[offset + 13]] + 转换密钥格式[arr[offset + 14]] + 转换密钥格式[arr[offset + 15]]).toLowerCase();
   return uuid;
