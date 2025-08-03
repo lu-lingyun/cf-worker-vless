@@ -75,7 +75,7 @@ function 使用64位加解密(还原混淆字符) {
 //第二步，解读VL协议数据，创建TCP握手
 async function 解析VL标头(VL数据, WS接口, TCP接口) {
   if (验证VL的密钥(new Uint8Array(VL数据.slice(1, 17))) !== 哎呀呀这是我的VL密钥) {
-    return null;
+    return new Response(null, { status: 400 });
   }
   const 获取数据定位 = new Uint8Array(VL数据)[17];
   const 提取端口索引 = 18 + 获取数据定位 + 1;
@@ -101,9 +101,7 @@ async function 解析VL标头(VL数据, WS接口, TCP接口) {
       地址长度 = 16;
       const dataView = new DataView(VL数据.slice(地址信息索引, 地址信息索引 + 地址长度));
       const ipv6 = [];
-      for (let i = 0; i < 8; i++) {
-        ipv6.push(dataView.getUint16(i * 2).toString(16));
-      }
+      for (let i = 0; i < 8; i++) { ipv6.push(dataView.getUint16(i * 2).toString(16)); }
       访问地址 = ipv6.join(":");
       break;
   }
@@ -125,9 +123,7 @@ function 验证VL的密钥(arr, offset = 0) {
   return uuid;
 }
 const 转换密钥格式 = [];
-for (let i = 0; i < 256; ++i) {
-  转换密钥格式.push((i + 256).toString(16).slice(1));
-}
+for (let i = 0; i < 256; ++i) { 转换密钥格式.push((i + 256).toString(16).slice(1)); }
 //第三步，创建客户端WS-CF-目标的传输通道并监听状态
 async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
   WS接口.accept();
