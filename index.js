@@ -104,6 +104,8 @@ async function 解析VL标头(VL数据, WS接口, TCP接口) {
       for (let i = 0; i < 8; i++) { ipv6.push(dataView.getUint16(i * 2).toString(16)); }
       访问地址 = ipv6.join(":");
       break;
+    default:
+      return new Response(null, { status: 400 });
   }
   const 写入初始数据 = VL数据.slice(地址信息索引 + 地址长度);
 
