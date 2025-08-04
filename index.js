@@ -117,6 +117,12 @@ async function 解析VL标头(VL数据, WS接口, TCP接口) {
     TCP接口 = connect({ hostname: 反代IP地址, port: 反代IP端口 || 访问端口, allowHalfOpen: true });
   }
 
+  try {
+    await TCP接口.opened;
+  } catch {
+    return new Response(null, { status: 400 });
+  }
+
   建立传输管道(WS接口, TCP接口, 写入初始数据);
 }
 
