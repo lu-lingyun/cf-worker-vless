@@ -144,13 +144,11 @@ async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
 
   WS接口.addEventListener("message", ({ data }) => 传输数据.write(data));
 
-  (async () => {
-    while (true) {
-      const { done, value } = await 读取数据.read();
-      if (done || !value) break;
-      if (value.length > 0) WS接口.send(value);
-    }
-  })();
+  while (true) {
+    const { done, value } = await 读取数据.read();
+    if (done || !value) break;
+    if (value.length > 0) WS接口.send(value);
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////订阅页面////////////////////////////////////////////////////////////////////////
