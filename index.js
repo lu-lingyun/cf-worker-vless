@@ -137,7 +137,7 @@ async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
   WS接口.send(new Uint8Array([0, 0]));
 
   const 传输数据 = TCP接口.writable.getWriter();
-  const 读取数据 = TCP接口.readable.getReader();
+  const 读取数据 = TCP接口.readable;
 
   if (写入初始数据) 传输数据.write(写入初始数据);
 
