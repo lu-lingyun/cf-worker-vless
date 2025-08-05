@@ -7,7 +7,7 @@ let 哎呀呀这是我的VL密钥 = "25284107-7424-40a5-8396-cdd0623f4f05"; // U
 let 我的优选 = []; // 节点列表
 let 我的优选TXT = ["https://raw.githubusercontent.com/shulng/shulng/refs/heads/main/ip.txt"]; // 优选TXT路径
 
-let 反代IP = 'ProxyIP.Vultr.CMLiussss.net'
+let 反代IP = "ProxyIP.Vultr.CMLiussss.net"
 
 let 我的节点名字 = "水灵"; // 节点名字
 
@@ -114,7 +114,7 @@ async function 解析VL标头(VL数据, WS接口, TCP接口) {
     await TCP接口.opened;
   } catch {
     try {
-      const [反代IP地址, 反代IP端口 = 访问端口] = 反代IP.split(':');
+      const [反代IP地址, 反代IP端口 = 访问端口] = 反代IP.split(":");
       TCP接口 = connect({ hostname: 反代IP地址, port: 反代IP端口, allowHalfOpen: true });
       await TCP接口.opened;
     } catch {
