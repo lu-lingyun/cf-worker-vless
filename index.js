@@ -133,19 +133,21 @@ const 转换密钥格式 = [];
 for (let i = 0; i < 256; ++i) { 转换密钥格式.push((i + 256).toString(16).slice(1)); }
 //第三步，创建客户端WS-CF-目标的传输通道并监听状态
 async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
-  WS接口.accept();
-  WS接口.send(new Uint8Array([0, 0]));
+  await WS接口.accept();
+  await WS接口.send(new Uint8Array([0, 0]));
 
   const 传输数据 = TCP接口.writable.getWriter();
   const 读取数据 = TCP接口.readable;
 
-  if (写入初始数据) 传输数据.write(写入初始数据);
+  if (写入初始数据) await 传输数据.write(写入初始数据);
 
-  WS接口.addEventListener("message", ({ data }) => 传输数据.write(data));
+  WS接口.addEventListener("message", async ({ data }) => {
+    await 传输数据.write(data);
+  });
 
-  读取数据.pipeTo(new WritableStream({
-    write(chunk) {
-      WS接口.send(chunk);
+  await 读取数据.pipeTo(new WritableStream({
+    async write(chunk) {
+      await WS接口.send(chunk);
     }
   }));
 }
