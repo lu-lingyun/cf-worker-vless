@@ -133,6 +133,8 @@ const 转换密钥格式 = [];
 for (let i = 0; i < 256; ++i) { 转换密钥格式.push((i + 256).toString(16).slice(1)); }
 //第三步，创建客户端WS-CF-目标的传输通道并监听状态
 async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
+  WS接口.accept();
+
   const 传输数据 = TCP接口.writable.getWriter();
   const 读取数据 = TCP接口.readable;
 
