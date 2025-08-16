@@ -134,6 +134,7 @@ for (let i = 0; i < 256; ++i) { 转换密钥格式.push((i + 256).toString(16).s
 //第三步，创建客户端WS-CF-目标的传输通道并监听状态
 async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
   // 向客户端发送WS握手认证信息
+  await WS接口.accept();
   await WS接口.send(new Uint8Array([0, 0]).buffer);
 
   // 获取TCP接口可写端的写入器
