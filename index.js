@@ -145,7 +145,6 @@ async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
     async start(控制器) {
       if (写入初始数据) {
         控制器.enqueue(写入初始数据);
-        写入初始数据 = null;
       }
       WS接口.addEventListener('message', (event) => 控制器.enqueue(event.data));
       WS接口.addEventListener('close', () => 控制器.close());
