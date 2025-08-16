@@ -133,51 +133,38 @@ const 转换密钥格式 = [];
 for (let i = 0; i < 256; ++i) { 转换密钥格式.push((i + 256).toString(16).slice(1)); }
 //第三步，创建客户端WS-CF-目标的传输通道并监听状态
 async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
-  await WS接口.accept();
-  await WS接口.send(new Uint8Array([0, 0]));
+  // 向客户端发送WS握手认证信息
+  await WS接口.send(new Uint8Array([0, 0]).buffer);
 
+  // 获取TCP接口可写端的写入器
   const 传输数据 = TCP接口.writable.getWriter();
-  const 读取数据 = TCP接口.readable;
 
-  if (写入初始数据) await 传输数据.write(写入初始数据);
-
-  // 监听WebSocket消息并将数据写入TCP连接
-  WS接口.addEventListener("message", async ({ data }) => {
-    if (data && data.byteLength > 0) { // 检查数据是否为空
-      await 传输数据.write(data);
+  // 监听WS接口数据并发送给TCP接口
+  const 数据流 = new ReadableStream({
+    async start(控制器) {
+      if (写入初始数据) {
+        控制器.enqueue(写入初始数据);
+        写入初始数据 = null;
+      }
+      WS接口.addEventListener('message', (event) => 控制器.enqueue(event.data));
+      WS接口.addEventListener('close', () => 控制器.close());
+      WS接口.addEventListener('error', () => 控制器.close());
     }
   });
 
-  // 监听WebSocket关闭事件，关闭TCP写入流
-  WS接口.addEventListener("close", async () => {
-    await 传输数据.close();
-  });
+  // 将客户端接收到的WS数据直接发往TCP接口
+  数据流.pipeTo(new WritableStream({
+    write(VL数据) {
+      传输数据.write(VL数据);
+    }
+  }));
 
-  // 监听WebSocket错误事件，关闭TCP写入流
-  WS接口.addEventListener("error", async () => {
-    await 传输数据.close();
-  });
-
-  try {
-    await 读取数据.pipeTo(new WritableStream({
-      async write(chunk) {
-        if (chunk && chunk.byteLength > 0) { // 检查数据是否为空
-          await WS接口.send(chunk);
-        }
-      },
-      // 当管道完成时关闭WebSocket连接
-      close() {
-        WS接口.close();
-      },
-      // 当管道出错时关闭WebSocket连接
-      abort() {
-        WS接口.close();
-      }
-    }));
-  } catch (error) {
-    // 捕获管道过程中的错误并关闭WebSocket连接
-    WS接口.close();
-  }
+  // 将TCP接口返回的数据直接通过WS接口发送回客户端
+  TCP接口.readable.pipeTo(new WritableStream({
+    write(VL数据) {
+      WS接口.send(VL数据);
+    }
+  }));
 }
 
 //////////////////////////////////////////////////////////////////////////订阅页面////////////////////////////////////////////////////////////////////////
