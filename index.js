@@ -141,15 +141,43 @@ async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
 
   if (写入初始数据) await 传输数据.write(写入初始数据);
 
+  // 监听WebSocket消息并将数据写入TCP连接
   WS接口.addEventListener("message", async ({ data }) => {
-    await 传输数据.write(data);
+    if (data && data.byteLength > 0) { // 检查数据是否为空
+      await 传输数据.write(data);
+    }
   });
 
-  await 读取数据.pipeTo(new WritableStream({
-    async write(chunk) {
-      await WS接口.send(chunk);
-    }
-  }));
+  // 监听WebSocket关闭事件，关闭TCP写入流
+  WS接口.addEventListener("close", async () => {
+    await 传输数据.close();
+  });
+
+  // 监听WebSocket错误事件，关闭TCP写入流
+  WS接口.addEventListener("error", async () => {
+    await 传输数据.close();
+  });
+
+  try {
+    await 读取数据.pipeTo(new WritableStream({
+      async write(chunk) {
+        if (chunk && chunk.byteLength > 0) { // 检查数据是否为空
+          await WS接口.send(chunk);
+        }
+      },
+      // 当管道完成时关闭WebSocket连接
+      close() {
+        WS接口.close();
+      },
+      // 当管道出错时关闭WebSocket连接
+      abort() {
+        WS接口.close();
+      }
+    }));
+  } catch (error) {
+    // 捕获管道过程中的错误并关闭WebSocket连接
+    WS接口.close();
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////订阅页面////////////////////////////////////////////////////////////////////////
