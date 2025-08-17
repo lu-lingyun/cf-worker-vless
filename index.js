@@ -132,17 +132,17 @@ function 验证VL的密钥(arr, offset = 0) {
 const 转换密钥格式 = [];
 for (let i = 0; i < 256; ++i) { 转换密钥格式.push((i + 256).toString(16).slice(1)); }
 //第三步，创建客户端WS-CF-目标的传输通道并监听状态
-async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
+function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
   // 向客户端发送WS握手认证信息
-  await WS接口.accept();
-  await WS接口.send(new Uint8Array([0, 0]).buffer);
+  WS接口.accept();
+  WS接口.send(new Uint8Array([0, 0]).buffer);
 
   // 获取TCP接口可写端的写入器
   const 传输数据 = TCP接口.writable.getWriter();
 
   // 监听WS接口数据并发送给TCP接口
   const 数据流 = new ReadableStream({
-    async start(控制器) {
+    start(控制器) {
       if (写入初始数据) {
         控制器.enqueue(写入初始数据);
         写入初始数据 = null;
