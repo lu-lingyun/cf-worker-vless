@@ -7,7 +7,7 @@ let 哎呀呀这是我的VL密钥 = "25284107-7424-40a5-8396-cdd0623f4f05"; // U
 let 我的优选 = []; // 节点列表
 let 我的优选TXT = ["https://raw.githubusercontent.com/shulng/shulng/refs/heads/main/ip.txt"]; // 优选TXT路径
 
-let 反代IP = "ProxyIP.Vultr.CMLiussss.net"
+let 反代IP = "ProxyIP.Vultr.CMLiussss.net";
 
 let 我的节点名字 = "水灵"; // 节点名字
 
@@ -101,7 +101,9 @@ async function 解析VL标头(VL数据, WS接口, TCP接口) {
       地址长度 = 16;
       const dataView = new DataView(VL数据.slice(地址信息索引, 地址信息索引 + 地址长度));
       const ipv6 = [];
-      for (let i = 0; i < 8; i++) { ipv6.push(dataView.getUint16(i * 2).toString(16)); }
+      for (let i = 0; i < 8; i++) {
+        ipv6.push(dataView.getUint16(i * 2).toString(16));
+      }
       访问地址 = ipv6.join(":");
       break;
     default:
@@ -131,7 +133,9 @@ function 验证VL的密钥(arr, offset = 0) {
   return uuid;
 }
 const 转换密钥格式 = [];
-for (let i = 0; i < 256; ++i) { 转换密钥格式.push((i + 256).toString(16).slice(1)); }
+for (let i = 0; i < 256; ++i) {
+  转换密钥格式.push((i + 256).toString(16).slice(1));
+}
 //第三步，创建客户端WS-CF-目标的传输通道并监听状态
 function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
   // 向客户端发送WS握手认证信息
@@ -148,25 +152,29 @@ function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
         控制器.enqueue(写入初始数据);
         写入初始数据 = null;
       }
-      WS接口.addEventListener('message', (event) => 控制器.enqueue(event.data));
-      WS接口.addEventListener('close', () => 控制器.close());
-      WS接口.addEventListener('error', () => 控制器.close());
-    }
+      WS接口.addEventListener("message", (event) => 控制器.enqueue(event.data));
+      WS接口.addEventListener("close", () => 控制器.close());
+      WS接口.addEventListener("error", () => 控制器.close());
+    },
   });
 
   // 将客户端接收到的WS数据直接发往TCP接口
-  数据流.pipeTo(new WritableStream({
-    write(VL数据) {
-      传输数据.write(VL数据);
-    }
-  }));
+  数据流.pipeTo(
+    new WritableStream({
+      write(VL数据) {
+        传输数据.write(VL数据);
+      },
+    })
+  );
 
   // 将TCP接口返回的数据直接通过WS接口发送回客户端
-  TCP接口.readable.pipeTo(new WritableStream({
-    write(VL数据) {
-      WS接口.send(VL数据);
-    }
-  }));
+  TCP接口.readable.pipeTo(
+    new WritableStream({
+      write(VL数据) {
+        WS接口.send(VL数据);
+      },
+    })
+  );
 }
 
 //////////////////////////////////////////////////////////////////////////订阅页面////////////////////////////////////////////////////////////////////////
