@@ -235,6 +235,8 @@ function 生成猫咪配置(hostName) {
     .join("\n");
   return `
 dns:
+  enable: true
+  ipv6: true
   nameserver:
     - 223.5.5.5
   fallback:
