@@ -137,7 +137,7 @@ for (let i = 0; i < 256; ++i) {
   转换密钥格式.push((i + 256).toString(16).slice(1));
 }
 //第三步，创建客户端WS-CF-目标的传输通道并监听状态
-function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
+async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
   // 向客户端发送WS握手认证信息
   WS接口.accept();
   WS接口.send(new Uint8Array([0, 0]).buffer);
@@ -147,7 +147,7 @@ function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
 
   // 监听WS接口数据并发送给TCP接口
   const 数据流 = new ReadableStream({
-    start(控制器) {
+    async start(控制器) {
       if (写入初始数据) {
         控制器.enqueue(写入初始数据);
         写入初始数据 = null;
@@ -161,7 +161,7 @@ function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
   // 将客户端接收到的WS数据直接发往TCP接口
   数据流.pipeTo(
     new WritableStream({
-      write(VL数据) {
+      async write(VL数据) {
         传输数据.write(VL数据);
       },
     })
@@ -170,7 +170,7 @@ function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
   // 将TCP接口返回的数据直接通过WS接口发送回客户端
   TCP接口.readable.pipeTo(
     new WritableStream({
-      write(VL数据) {
+      async write(VL数据) {
         WS接口.send(VL数据);
       },
     })
