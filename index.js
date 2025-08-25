@@ -141,7 +141,7 @@ async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
   // 向客户端发送WS握手认证信息
   WS接口.accept();
   WS接口.send(new Uint8Array([0, 0]));
-  
+
   // 获取TCP接口可写端的写入器
   const 传输数据 = TCP接口.writable.getWriter();
 
