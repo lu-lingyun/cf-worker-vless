@@ -50,6 +50,7 @@ export default {
           headers: { "Content-Type": "text/plain;charset=utf-8" },
         });
       }
+      return new Response(null, { status: 404 });
     } else if (读取我的请求标头 === "websocket") {
       return await 升级WS请求(访问请求);
     }
@@ -126,6 +127,8 @@ async function 解析VL标头(VL数据, WS接口, TCP接口) {
   }
 
   建立传输管道(WS接口, TCP接口, 写入初始数据);
+  // 补充返回值，防止函数无返回值
+  return new Response(null, { status: 101, webSocket: WS接口 });
 }
 
 function 验证VL的密钥(arr, offset = 0) {
@@ -175,6 +178,8 @@ async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
       },
     })
   );
+  // 补充返回值，确保函数有返回值
+  return Promise.resolve();
 }
 
 //////////////////////////////////////////////////////////////////////////订阅页面////////////////////////////////////////////////////////////////////////
