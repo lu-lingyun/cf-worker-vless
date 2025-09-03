@@ -34,7 +34,7 @@ export default {
         我的优选 = Array.from(唯一值集合);
       }
       if (url.pathname === `/${哎呀呀这是我的ID啊}`) {
-        const 用户代理 = 访问请求.headers.get("User-Agent").toLowerCase();
+        const 用户 = 访问请求.headers.get("User-Agent").toLowerCase();
         const 主机名 = 访问请求.headers.get("Host");
 
         const 配置生成器 = {
@@ -42,7 +42,7 @@ export default {
           clash: 生成猫咪配置,
           default: (host) => btoa(unescape(encodeURIComponent(生成通用配置(host)))),
         };
-        const 工具 = Object.keys(配置生成器).find((工具) => 用户代理.includes(工具)) || "default";
+        const 工具 = Object.keys(配置生成器).find((工具) => 用户.includes(工具)) || "default";
         const 生成配置 = 配置生成器[工具];
 
         return new Response(生成配置(主机名), {
