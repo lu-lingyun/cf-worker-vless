@@ -19,7 +19,7 @@ async function 升级WS请求() {
   const [客户端, WS接口] = Object.values(创建WS接口);
   WS接口.accept();
   WS接口.send(new Uint8Array([0, 0]));
-  await 启动传输管道(WS接口);
+  启动传输管道(WS接口);
   return new Response(null, { status: 101, webSocket: 客户端 });
 }
 async function 启动传输管道(WS接口) {
@@ -27,7 +27,7 @@ async function 启动传输管道(WS接口) {
     首包数据 = false,
     首包处理 = Promise.resolve(),
     传输数据;
-  WS接口.addEventListener("message", async (event) => {
+  WS接口.addEventListener("message", (event) => {
     首包处理 = 首包处理.then(async () => {
       if (!首包数据) {
         首包数据 = true;
