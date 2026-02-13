@@ -62,13 +62,14 @@ async function 启动传输管道(WS接口) {
     let 地址信息索引 = 提取地址索引 + 1;
 
     switch (识别地址类型) {
-      case 1:
+      case 1: {
         地址长度 = 4;
         访问地址 = new Uint8Array(
           VL数据.slice(地址信息索引, 地址信息索引 + 地址长度),
         ).join(".");
         break;
-      case 2:
+      }
+      case 2: {
         地址长度 = new Uint8Array(
           VL数据.slice(地址信息索引, 地址信息索引 + 1),
         )[0];
@@ -77,6 +78,7 @@ async function 启动传输管道(WS接口) {
           VL数据.slice(地址信息索引, 地址信息索引 + 地址长度),
         );
         break;
+      }
       case 3: {
         地址长度 = 16;
         const dataView = new DataView(
